@@ -16,8 +16,63 @@ app.controller('MainCtrl', function ($scope, $http, $timeout, patternService) {
   $scope.accessToken = "";
   $scope.busy = false;
   $scope.pattern = {};
+  $scope.power = 1;
+  $scope.powerText = "On";
+  $scope.status = "Please enter your device ID and access token.";
 
   $scope.patterns = [];
+
+  chrome.storage.sync.get('deviceId',
+    function(result) {
+      $scope.deviceId = result.deviceId;
+    }
+  );
+
+  chrome.storage.sync.get('accessToken',
+    function(result) {
+      $scope.accessToken = result.accessToken;
+    }
+  );
+
+  $scope.save = function () {
+    chrome.storage.sync.set({'deviceId': $scope.deviceId, 'accessToken': $scope.accessToken},
+    function() {
+      message('Settings saved');
+    });
+  }
+
+  $scope.getPower = function () {
+    $scope.busy = true;
+    $http.get('https://api.spark.io/v1/devices/' + $scope.deviceId + '/power?access_token=' + $scope.accessToken).
+      success(function (data, status, headers, config) {
+        $scope.busy = false;
+        $scope.power = data.result;
+        $scope.powerText = $scope.power == 1 ? "On" : "Off";
+      }).
+      error(function (data, status, headers, config) {
+        $scope.busy = false;
+        $scope.status = data.error_description;
+      });
+  };
+
+  $scope.setPower = function (power) {
+    $scope.busy = true;
+    $http({
+      method: 'POST',
+      url: 'https://api.spark.io/v1/devices/' + $scope.deviceId + '/power',
+      data: { access_token: $scope.accessToken, args: power },
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+    }).
+    success(function (data, status, headers, config) {
+      $scope.busy = false;
+      $scope.power = data.return_value;
+      $scope.powerText = $scope.power == 1 ? "On" : "Off";
+    }).
+    error(function (data, status, headers, config) {
+      $scope.busy = false;
+        $scope.status = data.error_description;
+    });
+  };
 
   $scope.getBrightness = function () {
     $scope.busy = true;
@@ -28,6 +83,7 @@ app.controller('MainCtrl', function ($scope, $http, $timeout, patternService) {
       }).
       error(function (data, status, headers, config) {
         $scope.busy = false;
+        $scope.status = data.error_description;
       });
   };
 
@@ -45,6 +101,7 @@ app.controller('MainCtrl', function ($scope, $http, $timeout, patternService) {
     }).
     error(function (data, status, headers, config) {
       $scope.busy = false;
+        $scope.status = data.error_description;
     });
   };
 
@@ -73,11 +130,13 @@ app.controller('MainCtrl', function ($scope, $http, $timeout, patternService) {
     promise.then(
       function (payload) {
         $scope.patternCount = payload.data.result;
+        $scope.patterns = [];
 
         $scope.getPatternNames(0);
       },
       function (errorPayload) {
         $scope.busy = false;
+        $scope.status = data.error_description;
       });
   };
 

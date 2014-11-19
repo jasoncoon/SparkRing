@@ -13,6 +13,13 @@
     <form class="form-horizontal" role="form">
 
       <div class="form-group">
+        <span class="col-sm-offset-2 col-sm-8" ng-bind="status"></span>
+        <div class="col-sm-1">
+          <button class="btn" id="btnSave" ng-click="save()" ng-disabled="busy">Save</button>
+        </div>
+      </div>
+
+      <div class="form-group">
         <label for="inputDeviceId" class="col-sm-2 control-label">Device ID</label>
         <div class="col-sm-10">
           <input ng-model="deviceId" class="form-control" id="inputDeviceId" placeholder="Device Id" />
@@ -27,15 +34,31 @@
       </div>
 
       <div class="form-group">
+        <label for="inputPower" class="col-sm-2 control-label">Power</label>
+        <div class="col-sm-4">
+          <input ng-model="powerText" class="form-control" id="inputPower" placeholder="Power" disabled="disabled" />
+        </div>
+        <div class="col-sm-1">
+          <button class="btn" id="btnGetPower" ng-click="getPower()" ng-disabled="busy">Get</button>
+        </div>
+        <div class="col-sm-1">
+          <button class="btn" id="btnPowerOn" ng-click="setPower(1)" ng-disabled="busy">On</button>
+        </div>
+        <div class="col-sm-1">
+          <button class="btn" id="btnPowerOff" ng-click="setPower(0)" ng-disabled="busy">Off</button>
+        </div>
+      </div>
+
+      <div class="form-group">
         <label for="inputBrightness" class="col-sm-2 control-label">Brightness</label>
         <div class="col-sm-4">
           <input ng-model="brightness" class="form-control" id="inputBrightness" type="number" min="0" max="255" />
         </div>
-        <div class="col-sm-2">
+        <div class="col-sm-1">
           <button class="btn" id="btnGetBrightness" ng-click="getBrightness()" ng-disabled="busy">Get</button>
         </div>
-        <div class="col-sm-2">
-          <button class="btn btn-default" id="btnSetBrightness" ng-click="setBrightness()" ng-disabled="busy">Set</button>
+        <div class="col-sm-1">
+          <button class="btn" id="btnSetBrightness" ng-click="setBrightness()" ng-disabled="busy">Set</button>
         </div>
       </div>
 
@@ -45,10 +68,10 @@
           <select size="10" ng-model="pattern" class="form-control" id="inputPattern" ng-options="pattern.name for pattern in patterns">
           </select>
         </div>
-        <div class="col-sm-2">
+        <div class="col-sm-1">
           <button class="btn" id="btnGetPattern" ng-click="getPatterns()" ng-disabled="busy">Get</button>
         </div>
-        <div class="col-sm-2">
+        <div class="col-sm-1">
           <button class="btn" id="btnSetPattern" ng-click="setPattern()" ng-disabled="busy">Set</button>
         </div>
       </div>

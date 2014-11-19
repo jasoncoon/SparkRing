@@ -8,6 +8,9 @@
     "16": "assets/icon_16.png",
     "128": "assets/icon_128.png"
   },
+  "permissions": [
+    "storage"
+  ],
   "app": {
     "background": {
       "scripts": [ "js/background.js" ]
