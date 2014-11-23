@@ -15,13 +15,14 @@ app.controller('MainCtrl', function ($scope, $http, $timeout, patternService) {
   $scope.deviceId = "";
   $scope.accessToken = "";
   $scope.busy = false;
-  $scope.pattern = {};
+  // $scope.pattern = "";
   $scope.power = 1;
   $scope.powerText = "On";
   $scope.status = "Please enter your device ID and access token.";
   $scope.disconnected = true;
 
   $scope.patterns = [];
+  $scope.patternIndex = 0;
 
   chrome.storage.sync.get('deviceId',
     function(result) {
@@ -131,6 +132,20 @@ app.controller('MainCtrl', function ($scope, $http, $timeout, patternService) {
     });
   };
 
+  $scope.getPatternIndex = function () {
+    $scope.busy = true;
+    $http.get('https://api.spark.io/v1/devices/' + $scope.deviceId + '/patternIndex?access_token=' + $scope.accessToken).
+      success(function (data, status, headers, config) {
+        $scope.busy = false;
+        $scope.patternIndex = data.result;
+        $scope.pattern = $scope.patterns[$scope.patternIndex];
+      }).
+      error(function (data, status, headers, config) {
+        $scope.busy = false;
+        $scope.status = data.error_description;
+      });
+  };
+
   $scope.getPatternNames = function (index) {
     if(index < $scope.patternCount) {
       var promise = patternService.getPatternName(index, $scope.deviceId, $scope.accessToken);
@@ -142,6 +157,7 @@ app.controller('MainCtrl', function ($scope, $http, $timeout, patternService) {
     }
     else {
       $scope.busy = false;
+      $scope.getPatternIndex();
     }
   };
 

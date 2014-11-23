@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Aurora</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="css/styles.css">
 </head>
@@ -13,36 +14,36 @@
     <form class="form-horizontal" role="form">
 
       <div class="form-group">
-        <span class="col-sm-offset-2 col-sm-8" ng-bind="status"></span>
+        <span class="col-sm-offset-3 col-sm-9" ng-bind="status"></span>
       </div>
 
       <div class="form-group">
-        <label for="inputDeviceId" class="col-sm-2 control-label">
+        <label for="inputDeviceId" class="col-sm-3 control-label">
           <a data-toggle="collapse" data-parent="#accordion" href="#collapseDeviceId" aria-expanded="true" aria-controls="collapseDeviceId">Device ID</a>
         </label>
-        <div class="col-sm-6" id="collapseDeviceId">
+        <div class="col-sm-9" id="collapseDeviceId">
           <input ng-model="deviceId" class="form-control" id="inputDeviceId" placeholder="Device Id" />
         </div>
       </div>
 
       <div class="form-group">
-        <label for="inputAccessToken" class="col-sm-2 control-label">
+        <label for="inputAccessToken" class="col-sm-3 control-label">
           <a data-toggle="collapse" data-parent="#accordion" href="#collapseAccessToken" aria-expanded="true" aria-controls="collapseAccessToken">Access Token</a>
         </label>
-        <div class="col-sm-6" id="collapseAccessToken">
+        <div class="col-sm-9" id="collapseAccessToken">
           <input ng-model="accessToken" class="form-control" id="inputAccessToken" placeholder="Access Token" />
         </div>
       </div>
 
       <div class="form-group">
-        <div class="col-sm-offset-2 col-sm-4">
+        <div class="col-sm-offset-3 col-sm-9">
           <button class="btn" id="btnConnect" ng-click="connect()" ng-disabled="busy">Connect</button>
           <button class="btn" id="btnSave" ng-click="save()" ng-disabled="busy">Save</button>
         </div>
       </div>
 
       <div class="form-group">
-        <div class="col-sm-offset-2 col-sm-1">
+        <div class="col-sm-offset-3 col-sm-9">
           <button class="btn" id="btnPower" ng-click="togglePower()" ng-disabled="busy || disconnected">
             <span class="glyphicon glyphicon-off"></span>
           </button>
@@ -50,8 +51,8 @@
       </div>
 
       <div class="form-group">
-        <label for="inputBrightness" class="col-sm-2 control-label">Brightness</label>
-        <div class="col-sm-4">
+        <label for="inputBrightness" class="col-sm-3 control-label">Brightness</label>
+        <div class="col-sm-8">
           <input ng-model="brightness" class="form-control" id="inputBrightness" type="number" min="0" max="255" ng-disabled="busy || disconnected" />
         </div>
         <div class="col-sm-1">
@@ -60,8 +61,8 @@
       </div>
 
       <div class="form-group">
-        <label for="inputPattern" class="col-sm-2 control-label">Pattern</label>
-        <div class="col-sm-4">
+        <label for="inputPattern" class="col-sm-3 control-label">Pattern</label>
+        <div class="col-sm-8">
           <select size="10" ng-model="pattern" class="form-control" id="inputPattern" ng-options="pattern.name for pattern in patterns" ng-disabled="busy || disconnected">
           </select>
         </div>
