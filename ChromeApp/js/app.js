@@ -12,8 +12,6 @@ app.config(function ($httpProvider) {
 
 app.controller('MainCtrl', function ($scope, $http, $timeout, patternService) {
   $scope.brightness = "";
-  $scope.deviceId = "";
-  $scope.accessToken = "";
   $scope.busy = false;
   // $scope.pattern = "";
   $scope.power = 1;
