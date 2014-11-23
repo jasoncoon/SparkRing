@@ -14,65 +14,57 @@
 
       <div class="form-group">
         <span class="col-sm-offset-2 col-sm-8" ng-bind="status"></span>
-        <div class="col-sm-1">
-          <button class="btn" id="btnSave" ng-click="save()" ng-disabled="busy">Save</button>
-        </div>
       </div>
 
       <div class="form-group">
         <label for="inputDeviceId" class="col-sm-2 control-label">Device ID</label>
-        <div class="col-sm-10">
+        <div class="col-sm-6">
           <input ng-model="deviceId" class="form-control" id="inputDeviceId" placeholder="Device Id" />
         </div>
       </div>
 
       <div class="form-group">
         <label for="inputAccessToken" class="col-sm-2 control-label">Access Token</label>
-        <div class="col-sm-10">
+        <div class="col-sm-6">
           <input ng-model="accessToken" class="form-control" id="inputAccessToken" placeholder="Access Token" />
         </div>
       </div>
 
       <div class="form-group">
-        <label for="inputPower" class="col-sm-2 control-label">Power</label>
-        <div class="col-sm-4">
-          <input ng-model="powerText" class="form-control" id="inputPower" placeholder="Power" disabled="disabled" />
+        <div class="col-sm-offset-2 col-sm-1">
+          <button class="btn" id="btnConnect" ng-click="connect()" ng-disabled="busy">Connect</button>
         </div>
         <div class="col-sm-1">
-          <button class="btn" id="btnGetPower" ng-click="getPower()" ng-disabled="busy">Get</button>
+          <button class="btn" id="btnSave" ng-click="save()" ng-disabled="busy">Save</button>
         </div>
-        <div class="col-sm-1">
-          <button class="btn" id="btnPowerOn" ng-click="setPower(1)" ng-disabled="busy">On</button>
-        </div>
-        <div class="col-sm-1">
-          <button class="btn" id="btnPowerOff" ng-click="setPower(0)" ng-disabled="busy">Off</button>
+      </div>
+
+      <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-1">
+          <button class="btn" id="btnPower" ng-click="togglePower()" ng-disabled="busy || disconnected">
+            <span class="glyphicon glyphicon-off"></span>
+          </button>
         </div>
       </div>
 
       <div class="form-group">
         <label for="inputBrightness" class="col-sm-2 control-label">Brightness</label>
         <div class="col-sm-4">
-          <input ng-model="brightness" class="form-control" id="inputBrightness" type="number" min="0" max="255" />
+          <input ng-model="brightness" class="form-control" id="inputBrightness" type="number" min="0" max="255" ng-disabled="busy || disconnected" />
         </div>
         <div class="col-sm-1">
-          <button class="btn" id="btnGetBrightness" ng-click="getBrightness()" ng-disabled="busy">Get</button>
-        </div>
-        <div class="col-sm-1">
-          <button class="btn" id="btnSetBrightness" ng-click="setBrightness()" ng-disabled="busy">Set</button>
+          <button class="btn" id="btnSetBrightness" ng-click="setBrightness()" ng-disabled="busy || disconnected">Set</button>
         </div>
       </div>
 
       <div class="form-group">
         <label for="inputPattern" class="col-sm-2 control-label">Pattern</label>
         <div class="col-sm-4">
-          <select size="10" ng-model="pattern" class="form-control" id="inputPattern" ng-options="pattern.name for pattern in patterns">
+          <select size="10" ng-model="pattern" class="form-control" id="inputPattern" ng-options="pattern.name for pattern in patterns" ng-disabled="busy || disconnected">
           </select>
         </div>
         <div class="col-sm-1">
-          <button class="btn" id="btnGetPattern" ng-click="getPatterns()" ng-disabled="busy">Get</button>
-        </div>
-        <div class="col-sm-1">
-          <button class="btn" id="btnSetPattern" ng-click="setPattern()" ng-disabled="busy">Set</button>
+          <button class="btn" id="btnSetPattern" ng-click="setPattern()" ng-disabled="busy || disconnected">Set</button>
         </div>
       </div>
 

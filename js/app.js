@@ -11,7 +11,7 @@ app.config(function ($httpProvider) {
 });
 
 app.controller('MainCtrl', function ($scope, $http, $timeout, patternService) {
-  $scope.brightness = 64;
+  $scope.brightness = "";
   $scope.deviceId = "";
   $scope.accessToken = "";
   $scope.busy = false;
@@ -19,6 +19,7 @@ app.controller('MainCtrl', function ($scope, $http, $timeout, patternService) {
   $scope.power = 1;
   $scope.powerText = "On";
   $scope.status = "Please enter your device ID and access token.";
+  $scope.disconnected = true;
 
   $scope.patterns = [];
 
@@ -41,13 +42,38 @@ app.controller('MainCtrl', function ($scope, $http, $timeout, patternService) {
     });
   }
 
+  $scope.connect = function() {
+    $scope.busy = true;
+
+    $http.get('https://api.spark.io/v1/devices/' + $scope.deviceId + '/power?access_token=' + $scope.accessToken).
+      success(function (data, status, headers, config) {
+        $scope.power = data.result;
+
+        $http.get('https://api.spark.io/v1/devices/' + $scope.deviceId + '/brightness?access_token=' + $scope.accessToken).
+        success(function (data, status, headers, config) {
+          $scope.brightness = data.result;
+
+          $scope.getPatterns();
+
+          $scope.disconnected = false;
+        }).
+        error(function (data, status, headers, config) {
+          $scope.busy = false;
+          $scope.status = data.error_description;
+        });
+      }).
+      error(function (data, status, headers, config) {
+        $scope.busy = false;
+        $scope.status = data.error_description;
+      });
+  }
+
   $scope.getPower = function () {
     $scope.busy = true;
     $http.get('https://api.spark.io/v1/devices/' + $scope.deviceId + '/power?access_token=' + $scope.accessToken).
       success(function (data, status, headers, config) {
         $scope.busy = false;
         $scope.power = data.result;
-        $scope.powerText = $scope.power == 1 ? "On" : "Off";
       }).
       error(function (data, status, headers, config) {
         $scope.busy = false;
@@ -55,18 +81,18 @@ app.controller('MainCtrl', function ($scope, $http, $timeout, patternService) {
       });
   };
 
-  $scope.setPower = function (power) {
+  $scope.togglePower = function () {
     $scope.busy = true;
+    var newPower = $scope.power == 0 ? 1 : 0;
     $http({
       method: 'POST',
       url: 'https://api.spark.io/v1/devices/' + $scope.deviceId + '/power',
-      data: { access_token: $scope.accessToken, args: power },
+      data: { access_token: $scope.accessToken, args: newPower },
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
     }).
     success(function (data, status, headers, config) {
       $scope.busy = false;
       $scope.power = data.return_value;
-      $scope.powerText = $scope.power == 1 ? "On" : "Off";
     }).
     error(function (data, status, headers, config) {
       $scope.busy = false;
