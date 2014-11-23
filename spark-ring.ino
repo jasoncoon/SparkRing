@@ -80,6 +80,9 @@ int patternIndex = 4;
 char patternName[32] = "Rainbow Cycle";
 int power = 1;
 
+uint16_t pixelIndex;
+uint16_t colorIndex;
+
 int setPower(String args) {
     power = args.toInt();
     if(power < 0)
@@ -111,6 +114,8 @@ int setPatternIndex(String args)
     else if (patternIndex >= patternCount)
         patternIndex = patternCount - 1;
         
+    pixelIndex = 0;
+    
     return patternIndex;
 }
 
@@ -180,83 +185,87 @@ void loop() {
   //strip.show();
   
   if(power < 1) {
-      colorAll(strip.Color(0, 0, 0), 0); // Black
+      colorAll(strip.Color(0, 0, 0)); // Black
+      strip.show();
       delay(250);
       return;
   }
   
+  uint8_t wait = 30;
+  
   switch(patternIndex)
   {
       case 0:
-      colorWipe(strip.Color(255, 0, 0), 50); // Red
+      colorWipe(strip.Color(255, 0, 0)); // Red
+      wait = 50;
       break;
       
       case 1:
-      colorWipe(strip.Color(0, 255, 0), 50); // Green
+      colorWipe(strip.Color(0, 255, 0)); // Green
+      wait = 50;
       break;
       
       case 2:
-      colorWipe(strip.Color(0, 0, 255), 50); // Blue
+      colorWipe(strip.Color(0, 0, 255)); // Blue
+      wait = 50;
       break;
       
       case 3:
-      rainbowCycle(20);
+      rainbowCycle();
+      wait = 20;
       break;
       
       case 4:
       default:
-      rainbowSpin(20);
+      rainbowSpin();
+      wait = 20;
       break;
       
       case 5:
-      colorAll(strip.Color(0, 255, 255), 50); // Magenta
+      colorAll(strip.Color(0, 255, 255)); // Magenta
+      wait = 50;
       break;
   }
-}
-
-// Set all pixels in the strip to a solid color, then wait (ms)
-void colorAll(uint32_t c, uint8_t wait) {
-  uint16_t i;
   
-  for(i=0; i<strip.numPixels(); i++) {
-    strip.setPixelColor(i, c);
-  }
   strip.show();
   delay(wait);
 }
 
-// Fill the dots one after the other with a color, wait (ms) after each one
-void colorWipe(uint32_t c, uint8_t wait) {
+// Set all pixels in the strip to a solid color
+void colorAll(uint32_t c) {
   for(uint16_t i=0; i<strip.numPixels(); i++) {
     strip.setPixelColor(i, c);
-    strip.show();
-    delay(wait);
   }
 }
 
-void rainbowCycle(uint8_t wait) {
-  uint16_t i, j;
+// Fill the dots one after the other with a color
+void colorWipe(uint32_t c) {
+    strip.setPixelColor(pixelIndex, c);
+    
+    pixelIndex++;
+    if(pixelIndex >= strip.numPixels())
+        pixelIndex = 0;
+}
 
-  for(j=0; j<256; j++) {
-    for(i=0; i<strip.numPixels(); i++) {
-      strip.setPixelColor(i, Wheel((i+j) & 255));
+void rainbowCycle() {
+    for(uint16_t i=0; i<strip.numPixels(); i++) {
+        strip.setPixelColor(i, Wheel((i+colorIndex) & 255));
     }
-    strip.show();
-    delay(wait);
-  }
+    
+    colorIndex++;
+    if(colorIndex >= 256)
+        colorIndex = 0;
 }
 
 // Slightly different, this makes the rainbow equally distributed throughout, then wait (ms)
-void rainbowSpin(uint8_t wait) {
-  uint16_t i, j;
-
-  for(j=0; j<256; j++) { // 1 cycle of all colors on wheel
-    for(i=0; i< strip.numPixels(); i++) {
-      strip.setPixelColor(i, Wheel(((i * 256 / strip.numPixels()) + j) & 255));
+void rainbowSpin() {
+    for(uint16_t i=0; i< strip.numPixels(); i++) {
+        strip.setPixelColor(i, Wheel(((i * 256 / strip.numPixels()) + colorIndex) & 255));
     }
-    strip.show();
-    delay(wait);
-  }
+    
+    colorIndex++;
+    if(colorIndex >= 256)
+        colorIndex = 0;
 }
 
 // Input a value 0 to 255 to get a color value.
