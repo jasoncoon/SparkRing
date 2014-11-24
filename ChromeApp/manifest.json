@@ -3,7 +3,7 @@
   "name": "Spark Ring",
   "short_name": "Spark Ring",
   "description": "Description for Spark Ring",
-  "version": "0.0.1.0",
+  "version": "0.0.1.1",
   "icons": {
     "16": "assets/icon_16.png",
     "128": "assets/icon_128.png"

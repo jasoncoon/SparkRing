@@ -3,6 +3,10 @@ SparkRing
 
 Control a [Adafruit NeoPixel Ring] with a [Spark Core] via a web browser or smartphone app.
 
+[Demo Video](http://www.youtube.com/watch?v=caFzIyTgmRw):
+
+[![Demo Video](http://img.youtube.com/vi/caFzIyTgmRw/3.jpg)](http://www.youtube.com/watch?v=caFzIyTgmRw)
+
 Hardware
 --------
 Requires a Spark Core, and works with either of the following:  
