@@ -1,7 +1,7 @@
 SparkRing
 =========
 
-Control a [NeoPixel Ring - 24] with a [Spark Core] via a web browser or smartphone app.
+Control a [Adafruit NeoPixel Ring] with a [Spark Core] via a web browser or smartphone app.
 
 Hardware
 --------
