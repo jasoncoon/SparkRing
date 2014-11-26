@@ -15,7 +15,7 @@ Requires a Spark Core, and works with either of the following:
 
 [![Spark Ring](spark-ring-2.png)](https://www.adafruit.com/product/1586)
 
-[Adafruit Spark NeoPixel Ring Kit] *not currently available)*:
+[Adafruit Spark NeoPixel Ring Kit] *not currently available*:
 
 [![Adafruit Spark NeoPixel Ring Kit](https://www.adafruit.com/images/230x173/2268-01.jpg)](https://www.adafruit.com/product/2268)
 
