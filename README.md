@@ -9,19 +9,20 @@ Control a [Adafruit NeoPixel Ring] with a [Spark Core] via a web browser or smar
 
 Hardware
 --------
-Requires a Spark Core, and works with either of the following:  
+Requires a Spark Core, and works with either of the following:
 
 [Adafruit NeoPixel Ring]
 
 [![Spark Ring](spark-ring-2.png)](https://www.adafruit.com/product/1586)
 
-[Adafruit Spark NeoPixel Ring Kit] (not currently available):  
+[Adafruit Spark NeoPixel Ring Kit] *not currently available)*:
 
 [![Adafruit Spark NeoPixel Ring Kit](https://www.adafruit.com/images/230x173/2268-01.jpg)](https://www.adafruit.com/product/2268)
 
 Features
 --------
 * Turn the NeoPixel Ring on and off
+* Adjust the time zone
 * Adjust the brightness
 * Change the display pattern
 
