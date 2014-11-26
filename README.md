@@ -9,7 +9,13 @@ Control a [Adafruit NeoPixel Ring] with a [Spark Core] via a web browser or smar
 
 Hardware
 --------
-Requires a Spark Core, and works with either of the following:
+Requires:
+
+[Spark Core]
+
+[![Spark Core](https://www.adafruit.com/images/230x173/2127-01.jpg)](https://www.adafruit.com/product/2127)
+
+Either of the following:
 
 [Adafruit NeoPixel Ring]
 
