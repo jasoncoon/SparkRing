@@ -51,6 +51,16 @@
       </div>
 
       <div class="form-group">
+        <label for="inputTimezone" class="col-sm-3 control-label">Time Zone</label>
+        <div class="col-sm-8">
+          <input ng-model="timezone" class="form-control" id="inputTimezone" type="number" min="-12" max="13" ng-disabled="busy || disconnected" />
+        </div>
+        <div class="col-sm-1">
+          <button class="btn" id="btnSetTimezone" ng-click="setTimezone()" ng-disabled="busy || disconnected">Set</button>
+        </div>
+      </div>
+
+      <div class="form-group">
         <label for="inputBrightness" class="col-sm-3 control-label">Brightness</label>
         <div class="col-sm-8">
           <input ng-model="brightness" class="form-control" id="inputBrightness" type="number" min="0" max="255" ng-disabled="busy || disconnected" />

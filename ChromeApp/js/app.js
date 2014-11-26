@@ -14,6 +14,7 @@ app.controller('MainCtrl', function ($scope, $http, $timeout, patternService) {
   $scope.brightness = "";
   $scope.busy = false;
   // $scope.pattern = "";
+  $scope.timezone = 0;
   $scope.power = 1;
   $scope.powerText = "On";
   $scope.status = "Please enter your device ID and access token.";
@@ -47,24 +48,33 @@ app.controller('MainCtrl', function ($scope, $http, $timeout, patternService) {
     $http.get('https://api.spark.io/v1/devices/' + $scope.deviceId + '/power?access_token=' + $scope.accessToken).
       success(function (data, status, headers, config) {
         $scope.power = data.result;
-
-        $http.get('https://api.spark.io/v1/devices/' + $scope.deviceId + '/brightness?access_token=' + $scope.accessToken).
-        success(function (data, status, headers, config) {
-          $scope.brightness = data.result;
-
-          $scope.getPatterns();
-
-          $scope.disconnected = false;
-        }).
-        error(function (data, status, headers, config) {
-          $scope.busy = false;
-          $scope.status = data.error_description;
-        });
       }).
       error(function (data, status, headers, config) {
         $scope.busy = false;
         $scope.status = data.error_description;
       });
+
+    $http.get('https://api.spark.io/v1/devices/' + $scope.deviceId + '/timezone?access_token=' + $scope.accessToken).
+      success(function (data, status, headers, config) {
+        $scope.timezone = data.result;
+      }).
+      error(function (data, status, headers, config) {
+        $scope.busy = false;
+        $scope.status = data.error_description;
+      });
+
+    $http.get('https://api.spark.io/v1/devices/' + $scope.deviceId + '/brightness?access_token=' + $scope.accessToken).
+      success(function (data, status, headers, config) {
+        $scope.brightness = data.result;
+      }).
+      error(function (data, status, headers, config) {
+        $scope.busy = false;
+        $scope.status = data.error_description;
+      });
+
+    $scope.getPatterns();
+
+    $scope.disconnected = false;
   }
 
   $scope.getPower = function () {
@@ -85,13 +95,44 @@ app.controller('MainCtrl', function ($scope, $http, $timeout, patternService) {
     var newPower = $scope.power == 0 ? 1 : 0;
     $http({
       method: 'POST',
-      url: 'https://api.spark.io/v1/devices/' + $scope.deviceId + '/power',
-      data: { access_token: $scope.accessToken, args: newPower },
+      url: 'https://api.spark.io/v1/devices/' + $scope.deviceId + '/variable',
+      data: { access_token: $scope.accessToken, args: "pwr:" + newPower },
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
     }).
     success(function (data, status, headers, config) {
       $scope.busy = false;
       $scope.power = data.return_value;
+    }).
+    error(function (data, status, headers, config) {
+      $scope.busy = false;
+        $scope.status = data.error_description;
+    });
+  };
+
+  $scope.getTimezone = function () {
+    $scope.busy = true;
+    $http.get('https://api.spark.io/v1/devices/' + $scope.deviceId + '/timezone?access_token=' + $scope.accessToken).
+      success(function (data, status, headers, config) {
+        $scope.busy = false;
+        $scope.timezone = data.result;
+      }).
+      error(function (data, status, headers, config) {
+        $scope.busy = false;
+        $scope.status = data.error_description;
+      });
+  };
+
+  $scope.setTimezone = function ($) {
+    $scope.busy = true;
+    $http({
+      method: 'POST',
+      url: 'https://api.spark.io/v1/devices/' + $scope.deviceId + '/variable',
+      data: { access_token: $scope.accessToken, args: "tz:" + $scope.timezone },
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+    }).
+    success(function (data, status, headers, config) {
+      $scope.busy = false;
+      $scope.brightness = data.return_value;
     }).
     error(function (data, status, headers, config) {
       $scope.busy = false;
@@ -116,8 +157,8 @@ app.controller('MainCtrl', function ($scope, $http, $timeout, patternService) {
     $scope.busy = true;
     $http({
       method: 'POST',
-      url: 'https://api.spark.io/v1/devices/' + $scope.deviceId + '/brightness',
-      data: { access_token: $scope.accessToken, args: $scope.brightness },
+      url: 'https://api.spark.io/v1/devices/' + $scope.deviceId + '/variable',
+      data: { access_token: $scope.accessToken, args: "brt:" + $scope.brightness },
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
     }).
     success(function (data, status, headers, config) {
