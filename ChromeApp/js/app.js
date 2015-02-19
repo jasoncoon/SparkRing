@@ -1,4 +1,4 @@
-var app = angular.module('app', []);
+var app = angular.module('app', ['colorpicker.module']);
 
 app.config(function ($httpProvider) {
   $httpProvider.defaults.transformRequest = function (data) {
@@ -16,6 +16,10 @@ app.controller('MainCtrl', function ($scope, $http, $timeout, patternService) {
   // $scope.pattern = "";
   $scope.timezone = 0;
   $scope.power = 1;
+  $scope.flipClock = 0;
+  $scope.r = 0;
+  $scope.g = 0;
+  $scope.b = 255;
   $scope.powerText = "On";
   $scope.status = "Please enter your device ID and access token.";
   $scope.disconnected = true;
@@ -72,6 +76,42 @@ app.controller('MainCtrl', function ($scope, $http, $timeout, patternService) {
         $scope.status = data.error_description;
       });
 
+    $http.get('https://api.spark.io/v1/devices/' + $scope.deviceId + '/flipClock?access_token=' + $scope.accessToken).
+      success(function (data, status, headers, config) {
+        $scope.flipClock = data.result;
+      }).
+      error(function (data, status, headers, config) {
+        $scope.busy = false;
+        $scope.status = data.error_description;
+      });
+
+    $http.get('https://api.spark.io/v1/devices/' + $scope.deviceId + '/r?access_token=' + $scope.accessToken).
+      success(function (data, status, headers, config) {
+        $scope.r = data.result;
+      }).
+      error(function (data, status, headers, config) {
+        $scope.busy = false;
+        $scope.status = data.error_description;
+      });
+
+    $http.get('https://api.spark.io/v1/devices/' + $scope.deviceId + '/g?access_token=' + $scope.accessToken).
+      success(function (data, status, headers, config) {
+        $scope.g = data.result;
+      }).
+      error(function (data, status, headers, config) {
+        $scope.busy = false;
+        $scope.status = data.error_description;
+      });
+
+    $http.get('https://api.spark.io/v1/devices/' + $scope.deviceId + '/b?access_token=' + $scope.accessToken).
+      success(function (data, status, headers, config) {
+        $scope.b = data.result;
+      }).
+      error(function (data, status, headers, config) {
+        $scope.busy = false;
+        $scope.status = data.error_description;
+      });
+
     $scope.getPatterns();
 
     $scope.disconnected = false;
@@ -105,7 +145,26 @@ app.controller('MainCtrl', function ($scope, $http, $timeout, patternService) {
     }).
     error(function (data, status, headers, config) {
       $scope.busy = false;
-        $scope.status = data.error_description;
+      $scope.status = data.error_description;
+    });
+  };
+
+  $scope.toggleFlipClock = function () {
+    $scope.busy = true;
+    var newFlipClock = $scope.flipClock == 0 ? 1 : 0;
+    $http({
+      method: 'POST',
+      url: 'https://api.spark.io/v1/devices/' + $scope.deviceId + '/variable',
+      data: { access_token: $scope.accessToken, args: "flpclk:" + newFlipClock },
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+    }).
+    success(function (data, status, headers, config) {
+      $scope.busy = false;
+      $scope.flipClock = data.return_value;
+    }).
+    error(function (data, status, headers, config) {
+      $scope.busy = false;
+      $scope.status = data.error_description;
     });
   };
 
@@ -132,7 +191,7 @@ app.controller('MainCtrl', function ($scope, $http, $timeout, patternService) {
     }).
     success(function (data, status, headers, config) {
       $scope.busy = false;
-      $scope.brightness = data.return_value;
+      $scope.timezone = data.return_value;
     }).
     error(function (data, status, headers, config) {
       $scope.busy = false;
@@ -164,6 +223,60 @@ app.controller('MainCtrl', function ($scope, $http, $timeout, patternService) {
     success(function (data, status, headers, config) {
       $scope.busy = false;
       $scope.brightness = data.return_value;
+    }).
+    error(function (data, status, headers, config) {
+      $scope.busy = false;
+        $scope.status = data.error_description;
+    });
+  };
+
+  $scope.setR = function ($) {
+    $scope.busy = true;
+    $http({
+      method: 'POST',
+      url: 'https://api.spark.io/v1/devices/' + $scope.deviceId + '/variable',
+      data: { access_token: $scope.accessToken, args: "r:" + $scope.r },
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+    }).
+    success(function (data, status, headers, config) {
+      $scope.busy = false;
+      $scope.r = data.return_value;
+    }).
+    error(function (data, status, headers, config) {
+      $scope.busy = false;
+        $scope.status = data.error_description;
+    });
+  };
+
+  $scope.setG = function ($) {
+    $scope.busy = true;
+    $http({
+      method: 'POST',
+      url: 'https://api.spark.io/v1/devices/' + $scope.deviceId + '/variable',
+      data: { access_token: $scope.accessToken, args: "g:" + $scope.g },
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+    }).
+    success(function (data, status, headers, config) {
+      $scope.busy = false;
+      $scope.g = data.return_value;
+    }).
+    error(function (data, status, headers, config) {
+      $scope.busy = false;
+        $scope.status = data.error_description;
+    });
+  };
+
+  $scope.setB = function ($) {
+    $scope.busy = true;
+    $http({
+      method: 'POST',
+      url: 'https://api.spark.io/v1/devices/' + $scope.deviceId + '/variable',
+      data: { access_token: $scope.accessToken, args: "b:" + $scope.b },
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+    }).
+    success(function (data, status, headers, config) {
+      $scope.busy = false;
+      $scope.b = data.return_value;
     }).
     error(function (data, status, headers, config) {
       $scope.busy = false;

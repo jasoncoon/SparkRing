@@ -2,7 +2,7 @@
 <html ng-app="app" ng-csp="">
 <head>
   <meta charset="UTF-8">
-  <title>Aurora</title>
+  <title>Spark Ring</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="css/styles.css">
@@ -78,6 +78,42 @@
         </div>
         <div class="col-sm-1">
           <button class="btn" id="btnSetPattern" ng-click="setPattern()" ng-disabled="busy || disconnected">Set</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="col-sm-offset-3 col-sm-9">
+          <button class="btn" id="btnFlipClock" ng-click="toggleFlipClock()" ng-disabled="busy || disconnected">Flip Clock</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="inputR" class="col-sm-3 control-label">Red</label>
+        <div class="col-sm-8">
+          <input ng-model="r" class="form-control" id="inputR" type="number" min="0" max="255" ng-disabled="busy || disconnected" />
+        </div>
+        <div class="col-sm-1">
+          <button class="btn" id="btnSetR" ng-click="setR()" ng-disabled="busy || disconnected">Set</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="inputG" class="col-sm-3 control-label">Green</label>
+        <div class="col-sm-8">
+          <input ng-model="g" class="form-control" id="inputG" type="number" min="0" max="255" ng-disabled="busy || disconnected" />
+        </div>
+        <div class="col-sm-1">
+          <button class="btn" id="btnSetG" ng-click="setG()" ng-disabled="busy || disconnected">Set</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="inputB" class="col-sm-3 control-label">Blue</label>
+        <div class="col-sm-8">
+          <input ng-model="b" class="form-control" id="inputB" type="number" min="0" max="255" ng-disabled="busy || disconnected" />
+        </div>
+        <div class="col-sm-1">
+          <button class="btn" id="btnSetG" ng-click="setB()" ng-disabled="busy || disconnected">Set</button>
         </div>
       </div>
 
