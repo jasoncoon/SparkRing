@@ -18,29 +18,33 @@
       </div>
 
       <div class="form-group">
-        <label for="inputDeviceId" class="col-sm-3 control-label">
-          <a data-toggle="collapse" data-parent="#accordion" href="#collapseDeviceId" aria-expanded="true" aria-controls="collapseDeviceId">Device ID</a>
-        </label>
-        <div class="col-sm-9" id="collapseDeviceId">
-          <input ng-model="deviceId" class="form-control" id="inputDeviceId" placeholder="Device Id" />
-        </div>
-      </div>
-
-      <div class="form-group">
         <label for="inputAccessToken" class="col-sm-3 control-label">
           <a data-toggle="collapse" data-parent="#accordion" href="#collapseAccessToken" aria-expanded="true" aria-controls="collapseAccessToken">Access Token</a>
         </label>
-        <div class="col-sm-9" id="collapseAccessToken">
+        <div class="col-sm-6" id="collapseAccessToken">
           <input ng-model="accessToken" class="form-control" id="inputAccessToken" placeholder="Access Token" />
+        </div>
+        <div class="col-sm-3">
+          <button class="btn" id="btnSave" ng-click="save()" ng-disabled="busy">Save</button>
         </div>
       </div>
 
       <div class="form-group">
         <div class="col-sm-offset-3 col-sm-9">
-          <button class="btn" id="btnConnect" ng-click="connect()" ng-disabled="busy">Connect</button>
-          <button class="btn" id="btnLoad" ng-click="load()" ng-disabled="busy">Load</button>
-          <button class="btn" id="btnSave" ng-click="save()" ng-disabled="busy">Save</button>
+          <button class="btn" id="btnGetDevices" ng-click="getDevices()" ng-disabled="busy">Get Devices</button>
         </div>
+      </div>
+
+      <div class="form-group">
+        <label for="inputDevices" class="col-sm-3 control-label">
+          <a data-toggle="collapse" data-parent="#accordion" href="#collapseDevices" aria-expanded="true" aria-controls="collapseDevices">Devices</a>
+        </label>
+        <div class="col-sm-6" id="collapseDevices">
+          <select class="form-control" ng-model="device"
+            ng-options="device.name for device in devices | orderBy:name">
+          </select>
+        </div>
+        <button class="btn" id="btnConnect" ng-click="connect()" ng-disabled="busy">Connect</button>
       </div>
 
       <div class="form-group">
