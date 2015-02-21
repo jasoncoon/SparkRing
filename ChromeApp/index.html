@@ -88,6 +88,16 @@
       </div>
 
       <div class="form-group">
+        <label for="inputColor" class="col-sm-3 control-label">Color</label>
+        <div class="col-sm-8">
+          <input colorpicker="rgb" type="text" ng-model="color" class="form-control" id="inputColor" ng-disabled="busy || disconnected" />
+        </div>
+        <div class="col-sm-1">
+          <button class="btn" id="btnSetColor" ng-click="setColor()" ng-disabled="busy || disconnected">Set</button>
+        </div>
+      </div>
+
+      <div class="form-group">
         <label for="inputR" class="col-sm-3 control-label">Red</label>
         <div class="col-sm-8">
           <input ng-model="r" class="form-control" id="inputR" type="number" min="0" max="255" ng-disabled="busy || disconnected" />
@@ -123,6 +133,7 @@
   <script src="./bower_components/angular/angular.min.js"></script>
   <script src="./bower_components/angular-route/angular-route.min.js"></script>
   <script src="./bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+  <script src="js/bootstrap-colorpicker-module.min.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

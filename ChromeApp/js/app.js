@@ -1,4 +1,5 @@
 var app = angular.module('app', ['colorpicker.module']);
+// var app = angular.module('app', []);
 
 app.config(function ($httpProvider) {
   $httpProvider.defaults.transformRequest = function (data) {
@@ -27,22 +28,28 @@ app.controller('MainCtrl', function ($scope, $http, $timeout, patternService) {
   $scope.patterns = [];
   $scope.patternIndex = 0;
 
+  $scope.status = 'Loading settings...';
+
   chrome.storage.sync.get('deviceId',
     function(result) {
+      $scope.status = 'Loaded device ID';
       $scope.deviceId = result.deviceId;
     }
   );
 
   chrome.storage.sync.get('accessToken',
     function(result) {
+      $scope.status = 'Loaded access token';
       $scope.accessToken = result.accessToken;
     }
   );
 
   $scope.save = function () {
+    $scope.status = 'Saving settings...';
     chrome.storage.sync.set({'deviceId': $scope.deviceId, 'accessToken': $scope.accessToken},
     function() {
-      message('Settings saved');
+      $scope.status = 'Settings saved';
+      // message('Settings saved');
     });
   }
 
@@ -52,6 +59,7 @@ app.controller('MainCtrl', function ($scope, $http, $timeout, patternService) {
     $http.get('https://api.spark.io/v1/devices/' + $scope.deviceId + '/power?access_token=' + $scope.accessToken).
       success(function (data, status, headers, config) {
         $scope.power = data.result;
+        $scope.status = 'Loaded power';
       }).
       error(function (data, status, headers, config) {
         $scope.busy = false;
@@ -61,6 +69,7 @@ app.controller('MainCtrl', function ($scope, $http, $timeout, patternService) {
     $http.get('https://api.spark.io/v1/devices/' + $scope.deviceId + '/timezone?access_token=' + $scope.accessToken).
       success(function (data, status, headers, config) {
         $scope.timezone = data.result;
+        $scope.status = 'Loaded time zone';
       }).
       error(function (data, status, headers, config) {
         $scope.busy = false;
@@ -70,6 +79,7 @@ app.controller('MainCtrl', function ($scope, $http, $timeout, patternService) {
     $http.get('https://api.spark.io/v1/devices/' + $scope.deviceId + '/brightness?access_token=' + $scope.accessToken).
       success(function (data, status, headers, config) {
         $scope.brightness = data.result;
+        $scope.status = 'Loaded power';
       }).
       error(function (data, status, headers, config) {
         $scope.busy = false;
