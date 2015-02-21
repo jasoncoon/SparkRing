@@ -38,6 +38,7 @@
       <div class="form-group">
         <div class="col-sm-offset-3 col-sm-9">
           <button class="btn" id="btnConnect" ng-click="connect()" ng-disabled="busy">Connect</button>
+          <button class="btn" id="btnLoad" ng-click="load()" ng-disabled="busy">Load</button>
           <button class="btn" id="btnSave" ng-click="save()" ng-disabled="busy">Save</button>
         </div>
       </div>
@@ -90,7 +91,7 @@
       <div class="form-group">
         <label for="inputColor" class="col-sm-3 control-label">Color</label>
         <div class="col-sm-8">
-          <input colorpicker="rgb" type="text" ng-model="color" class="form-control" id="inputColor" ng-disabled="busy || disconnected" />
+          <input type="color" ng-model="color" class="form-control" id="inputColor" ng-disabled="busy || disconnected" />
         </div>
         <div class="col-sm-1">
           <button class="btn" id="btnSetColor" ng-click="setColor()" ng-disabled="busy || disconnected">Set</button>
@@ -133,7 +134,6 @@
   <script src="./bower_components/angular/angular.min.js"></script>
   <script src="./bower_components/angular-route/angular-route.min.js"></script>
   <script src="./bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
-  <script src="js/bootstrap-colorpicker-module.min.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

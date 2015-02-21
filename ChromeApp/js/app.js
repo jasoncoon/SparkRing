@@ -1,5 +1,4 @@
-var app = angular.module('app', ['colorpicker.module']);
-// var app = angular.module('app', []);
+var app = angular.module('app', []);
 
 app.config(function ($httpProvider) {
   $httpProvider.defaults.transformRequest = function (data) {
@@ -18,38 +17,42 @@ app.controller('MainCtrl', function ($scope, $http, $timeout, patternService) {
   $scope.timezone = 0;
   $scope.power = 1;
   $scope.flipClock = 0;
+  $scope.color = "#0000ff"
   $scope.r = 0;
   $scope.g = 0;
   $scope.b = 255;
   $scope.powerText = "On";
   $scope.status = "Please enter your device ID and access token.";
-  $scope.disconnected = true;
+  $scope.disconnected = false;
 
   $scope.patterns = [];
   $scope.patternIndex = 0;
 
-  $scope.status = 'Loading settings...';
+  $scope.load = function() {
+    $scope.status = 'Loading settings...';
 
-  chrome.storage.sync.get('deviceId',
-    function(result) {
-      $scope.status = 'Loaded device ID';
-      $scope.deviceId = result.deviceId;
-    }
-  );
+    chrome.storage.sync.get('deviceId',
+      function(result) {
+        $scope.status = 'Loaded device ID';
+        $scope.deviceId = result.deviceId;
+        $('#inputDeviceId').scope().$apply();
+      }
+    );
 
-  chrome.storage.sync.get('accessToken',
-    function(result) {
-      $scope.status = 'Loaded access token';
-      $scope.accessToken = result.accessToken;
-    }
-  );
+    chrome.storage.sync.get('accessToken',
+      function(result) {
+        $scope.status = 'Loaded access token';
+        $scope.accessToken = result.accessToken;
+        $('#inputAccessToken').scope().$apply();
+      }
+    );
+  }
 
   $scope.save = function () {
     $scope.status = 'Saving settings...';
     chrome.storage.sync.set({'deviceId': $scope.deviceId, 'accessToken': $scope.accessToken},
     function() {
       $scope.status = 'Settings saved';
-      // message('Settings saved');
     });
   }
 
@@ -239,6 +242,27 @@ app.controller('MainCtrl', function ($scope, $http, $timeout, patternService) {
         $scope.status = data.error_description;
     });
   };
+
+  $scope.setColor = function ($) {
+    var rgb = $scope.hexToRgb();
+
+    $scope.r = rgb.r;
+    $scope.g = rgb.g;
+    $scope.b = rgb.b;
+
+    $scope.setR();
+    $scope.setG();
+    $scope.setB();
+  };
+
+  $scope.hexToRgb = function ($) {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec($scope.color);
+    return result ? {
+        r: parseInt(result[1], 16),
+        g: parseInt(result[2], 16),
+        b: parseInt(result[3], 16)
+    } : null;
+  }
 
   $scope.setR = function ($) {
     $scope.busy = true;
