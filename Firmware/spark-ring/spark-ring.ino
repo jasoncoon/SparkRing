@@ -8,14 +8,14 @@ FASTLED_USING_NAMESPACE;
 
 #define LED_PIN     1
 #define CLOCK_PIN   0
-#define COLOR_ORDER GBR // BGR
+#define COLOR_ORDER GBR // jcoon-1 = GBR; jcoon-2 = BGR;
 #define CHIPSET     APA102
 #define NUM_LEDS    60
 CRGB leds[NUM_LEDS];
 
 uint8_t brightness = 32;
 
-int patternCount = 9;
+int patternCount = 10;
 int patternIndex = 0;
 char patternName[32] = "Rainbow";
 int power = 1;
@@ -26,11 +26,31 @@ unsigned long lastTimeSync = millis();
 
 uint8_t gHue = 0; // rotating "base color" used by many of the patterns
 
+CRGBPalette16 palette = RainbowColors_p;
+  
 CRGB solidColor = CRGB::Blue;
+int r = 0;
+int g = 0;
+int b = 255;
+
+SYSTEM_MODE(SEMI_AUTOMATIC);
+
+int offlinePin = D7;
 
 void setup() {
-    // Serial.begin(9600);
+    FastLED.addLeds<CHIPSET, LED_PIN, CLOCK_PIN, COLOR_ORDER, DATA_RATE_MHZ(12)>(leds, NUM_LEDS);
+    FastLED.setCorrection(CRGB( 160, 255, 255));
+    FastLED.setBrightness(brightness);
+    fill_solid(leds, NUM_LEDS, CRGB::Blue);
+    FastLED.show();
     
+    pinMode(offlinePin, INPUT_PULLUP);
+    
+    if(digitalRead(offlinePin) == HIGH) {
+        Spark.connect();
+    }
+    
+    // Serial.begin(9600);
     // load settings from EEPROM
     brightness = EEPROM.read(0);
     if(brightness < 1)
@@ -61,12 +81,17 @@ void setup() {
     else if (flipClock > 1)
         flipClock = 1;
         
-    solidColor.r = EEPROM.read(5);
-    solidColor.g = EEPROM.read(6);
-    solidColor.b = EEPROM.read(7);
+    r = EEPROM.read(5);
+    g = EEPROM.read(6);
+    b = EEPROM.read(7);
     
-    if(solidColor.r == 0 && solidColor.g == 0 && solidColor.b == 0)
-        solidColor = CRGB::Blue;
+    if(r == 0 && g == 0 && b == 0) {
+        r = 0;
+        g = 0;
+        b = 255;
+    }
+    
+    solidColor = CRGB(r, b, g);
     
     Spark.function("variable", setVariable);
     Spark.function("patternIndex", setPatternIndex);
@@ -79,19 +104,15 @@ void setup() {
     Spark.variable("patternCount", &patternCount, INT);
     Spark.variable("patternIndex", &patternIndex, INT);
     Spark.variable("patternName", patternName, STRING);
-    Spark.variable("patternCount", &solidColor.r, INT);
-    Spark.variable("patternCount", &solidColor.g, INT);
-    Spark.variable("patternCount", &solidColor.b, INT);
+    Spark.variable("r", &r, INT);
+    Spark.variable("g", &g, INT);
+    Spark.variable("b", &b, INT);
     
     Time.zone(timezone);
-    
-    FastLED.addLeds<CHIPSET, LED_PIN, CLOCK_PIN, COLOR_ORDER, DATA_RATE_MHZ(12)>(leds, NUM_LEDS);
-    FastLED.setCorrection(TypicalLEDStrip);
-    FastLED.setBrightness(brightness);
 }
 
 void loop() {
-  if (millis() - lastTimeSync > ONE_DAY_MILLIS) {
+  if (Spark.connected() && millis() - lastTimeSync > ONE_DAY_MILLIS) {
     // Request time synchronization from the Spark Cloud
     Spark.syncTime();
     lastTimeSync = millis();
@@ -134,14 +155,18 @@ void loop() {
       break;
       
       case 6:
-      delay = analogClock();
+      delay = fire();
       break;
       
       case 7:
-      delay = fastAnalogClock();
+      delay = analogClock();
       break;
       
       case 8:
+      delay = fastAnalogClock();
+      break;
+      
+      case 9:
       delay = showSolidColor(solidColor);
       break;
   }
@@ -168,21 +193,21 @@ int setVariable(String args) {
         return setFlipClock(args.substring(7));
     }
     else if (args.startsWith("r:")) {
-        byte r = parseByte(args.substring(2));
+        r = parseByte(args.substring(2));
         solidColor.r = r;
         EEPROM.write(5, r);
         patternIndex = 8;
         return r;
     }
     else if (args.startsWith("g:")) {
-        byte g = parseByte(args.substring(2));
+        g = parseByte(args.substring(2));
         solidColor.g = g;
         EEPROM.write(6, g);
         patternIndex = 8;
         return g;
     }
     else if (args.startsWith("b:")) {
-        byte b = parseByte(args.substring(2));
+        b = parseByte(args.substring(2));
         solidColor.b = b;
         EEPROM.write(7, b);
         patternIndex = 8;
@@ -307,14 +332,18 @@ int setPatternName(String args)
         break;
         
         case 6:
-        strcpy(patternName, "Analog Clock");
+        strcpy(patternName, "Fire");
         break;
         
         case 7:
-        strcpy(patternName, "Fast Analog Clock");
+        strcpy(patternName, "Analog Clock");
         break;
         
         case 8:
+        strcpy(patternName, "Fast Analog Clock");
+        break;
+        
+        case 9:
         strcpy(patternName, "Solid Color");
         break;
   }
@@ -359,7 +388,6 @@ uint8_t bpm()
 {
   // colored stripes pulsing at a defined Beats-Per-Minute (BPM)
   uint8_t BeatsPerMinute = 62;
-  CRGBPalette16 palette = RainbowColors_p;
   uint8_t beat = beatsin8( BeatsPerMinute, 64, 255);
   for( int i = 0; i < NUM_LEDS; i++) { //9948
     leds[i] = ColorFromPalette(palette, gHue+(i*2), beat-gHue+(i*10));
@@ -378,6 +406,52 @@ uint8_t juggle() {
   }
   
   return 8;
+}
+
+uint8_t fire() {
+    // Add entropy to random number generator; we use a lot of it.
+    random16_add_entropy(random(256));
+    
+    uint8_t cooling = 55;
+    uint8_t sparking = 120;
+    
+    // Array of temperature readings at each simulation cell
+    static const uint8_t fireLedCount = NUM_LEDS / 2;
+    static byte heat[fireLedCount];
+    
+    // Step 1.  Cool down every cell a little
+    for( int i = 0; i < fireLedCount; i++) {
+      heat[i] = qsub8( heat[i],  random8(0, ((cooling * 10) / fireLedCount) + 2));
+    }
+    
+    // Step 2.  Heat from each cell drifts 'up' and diffuses a little
+    for( int k= fireLedCount - 1; k >= 2; k--) {
+      heat[k] = (heat[k - 1] + heat[k - 2] + heat[k - 2] ) / 3;
+    }
+    
+    // Step 3.  Randomly ignite new 'sparks' of heat near the bottom
+    if( random8() < sparking ) {
+      int y = random8(7);
+      heat[y] = qadd8( heat[y], random8(160,255) );
+    }
+    
+    byte colorindex = scale8(heat[0], 240);
+    
+    leds[fireLedCount] = ColorFromPalette(HeatColors_p, colorindex);
+    
+    // Step 4.  Map from heat cells to LED colors
+    for( int j = 0; j < fireLedCount; j++) {
+      // Scale the heat value from 0-255 down to 0-240
+      // for best results with color palettes.
+      colorindex = scale8(heat[j], 240);
+      leds[(fireLedCount - 1) - j] = ColorFromPalette(HeatColors_p, colorindex);
+      leds[(fireLedCount - 1) + j] = ColorFromPalette(HeatColors_p, colorindex);
+    }
+    
+    colorindex = scale8(heat[fireLedCount - 1], 240);
+    leds[NUM_LEDS - 1] = ColorFromPalette(HeatColors_p, colorindex);
+    
+    return 15;
 }
 
 int oldSecTime = 0;

@@ -57,7 +57,7 @@ app.controller('MainCtrl', function ($scope, $http, $timeout, patternService) {
 
   $scope.save = function () {
     $scope.status = 'Saving access token...';
-    chrome.storage.sync.set({'deviceId': $scope.device.Id, 'accessToken': $scope.accessToken},
+    chrome.storage.sync.set({'accessToken': $scope.accessToken},
     function() {
       $scope.status = 'Saved access token';
     });
