@@ -13,9 +13,35 @@ FASTLED_USING_NAMESPACE;
 #define NUM_LEDS    60
 CRGB leds[NUM_LEDS];
 
+#define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
+ 
+// List of patterns to cycle through.  Each is defined as a separate function below.
+
+typedef uint8_t (*SimplePattern)();
+typedef SimplePattern SimplePatternList[];
+typedef struct { SimplePattern drawFrame;  char name[32]; } PatternAndName;
+typedef PatternAndName PatternAndNameList[];
+ 
+// These times are in seconds, but could be changed to milliseconds if desired;
+// there's some discussion further below.
+ 
+const PatternAndNameList patterns = { 
+  { rainbow,            "Rainbow" },
+  { rainbowWithGlitter, "Rainbow With Glitter" },
+  { confetti,           "Confetti" },
+  { sinelon,            "Sinelon" },
+  { bpm,                "Beat" },
+  { juggle,             "Juggle" },
+  { fire,               "Fire" },
+  { water,              "Water" },
+  { analogClock,        "Analog Clock" },
+  { fastAnalogClock,    "Fast Analog Clock Test" },
+  { showSolidColor,     "Solid Color" }
+};
+
 uint8_t brightness = 32;
 
-int patternCount = 10;
+int patternCount = ARRAY_SIZE(patterns);
 int patternIndex = 0;
 char patternName[32] = "Rainbow";
 int power = 1;
@@ -57,6 +83,8 @@ void setup() {
         brightness = 1;
     else if(brightness > 255)
         brightness = 255;
+    
+    FastLED.setBrightness(brightness);
     
     uint8_t timezoneSign = EEPROM.read(1);
     if(timezoneSign < 1)
@@ -125,51 +153,7 @@ void loop() {
       return;
   }
   
-  uint8_t delay = 8;
-  
-  switch(patternIndex)
-  {
-      case 0:
-      default:
-      delay = rainbow();
-      break;
-      
-      case 1:
-      delay = rainbowWithGlitter();
-      break;
-      
-      case 2:
-      delay = confetti();
-      break;
-      
-      case 3:
-      delay = sinelon();
-      break;
-      
-      case 4:
-      delay = bpm();
-      break;
-      
-      case 5:
-      delay = juggle();
-      break;
-      
-      case 6:
-      delay = fire();
-      break;
-      
-      case 7:
-      delay = analogClock();
-      break;
-      
-      case 8:
-      delay = fastAnalogClock();
-      break;
-      
-      case 9:
-      delay = showSolidColor(solidColor);
-      break;
-  }
+  uint8_t delay = patterns[patternIndex].drawFrame();
   
   // send the 'leds' array out to the actual LED strip
   FastLED.show();
@@ -298,57 +282,15 @@ int setPatternIndex(String args)
 
 int setPatternName(String args)
 {
-    int pattern = args.toInt();
-    if(pattern < 0)
-        pattern = 0;
-    else if (pattern >= patternCount)
-        pattern = patternCount - 1;
+    int index = args.toInt();
+    if(index < 0)
+        index = 0;
+    else if (index >= patternCount)
+        index = patternCount - 1;
     
-    switch(pattern)
-    {
-        case 0:
-        strcpy(patternName, "Rainbow");
-        break;
-        
-        case 1:
-        strcpy(patternName, "Rainbow With Glitter");
-        break;
-      
-        case 2:
-        strcpy(patternName, "Confetti");
-        break;
-        
-        case 3:
-        strcpy(patternName, "Sinelon");
-        break;
-        
-        case 4:
-        default:
-        strcpy(patternName, "BPM");
-        break;
-        
-        case 5:
-        strcpy(patternName, "Juggle");
-        break;
-        
-        case 6:
-        strcpy(patternName, "Fire");
-        break;
-        
-        case 7:
-        strcpy(patternName, "Analog Clock");
-        break;
-        
-        case 8:
-        strcpy(patternName, "Fast Analog Clock");
-        break;
-        
-        case 9:
-        strcpy(patternName, "Solid Color");
-        break;
-  }
-  
-    return pattern;
+    strcpy(patternName, patterns[index].name);
+    
+    return index;
 }
 
 uint8_t rainbow() 
@@ -409,53 +351,18 @@ uint8_t juggle() {
 }
 
 uint8_t fire() {
-    // Add entropy to random number generator; we use a lot of it.
-    random16_add_entropy(random(256));
-    
-    uint8_t cooling = 55;
-    uint8_t sparking = 120;
-    
-    // Array of temperature readings at each simulation cell
-    static const uint8_t fireLedCount = NUM_LEDS / 2;
-    static byte heat[fireLedCount];
-    
-    // Step 1.  Cool down every cell a little
-    for( int i = 0; i < fireLedCount; i++) {
-      heat[i] = qsub8( heat[i],  random8(0, ((cooling * 10) / fireLedCount) + 2));
-    }
-    
-    // Step 2.  Heat from each cell drifts 'up' and diffuses a little
-    for( int k= fireLedCount - 1; k >= 2; k--) {
-      heat[k] = (heat[k - 1] + heat[k - 2] + heat[k - 2] ) / 3;
-    }
-    
-    // Step 3.  Randomly ignite new 'sparks' of heat near the bottom
-    if( random8() < sparking ) {
-      int y = random8(7);
-      heat[y] = qadd8( heat[y], random8(160,255) );
-    }
-    
-    byte colorindex = scale8(heat[0], 240);
-    
-    leds[fireLedCount] = ColorFromPalette(HeatColors_p, colorindex);
-    
-    // Step 4.  Map from heat cells to LED colors
-    for( int j = 0; j < fireLedCount; j++) {
-      // Scale the heat value from 0-255 down to 0-240
-      // for best results with color palettes.
-      colorindex = scale8(heat[j], 240);
-      leds[(fireLedCount - 1) - j] = ColorFromPalette(HeatColors_p, colorindex);
-      leds[(fireLedCount - 1) + j] = ColorFromPalette(HeatColors_p, colorindex);
-    }
-    
-    colorindex = scale8(heat[fireLedCount - 1], 240);
-    leds[NUM_LEDS - 1] = ColorFromPalette(HeatColors_p, colorindex);
+    heatMap(HeatColors_p, true);
     
     return 15;
 }
 
-int oldSecTime = 0;
-int oldSec = 0;
+CRGBPalette16 icePalette = CRGBPalette16(CRGB::Black, CRGB::Blue, CRGB::Aqua, CRGB::White);
+
+uint8_t water() {
+    heatMap(icePalette, false);
+    
+    return 30;
+}
 
 uint8_t analogClock() {
     dimAll(220);
@@ -495,11 +402,74 @@ uint8_t fastAnalogClock() {
     return 125;
 }
 
-uint8_t showSolidColor(CRGB color) {
-    fill_solid(leds, NUM_LEDS, color);
+uint8_t showSolidColor() {
+    fill_solid(leds, NUM_LEDS, solidColor);
     
     return 30;
 }
+
+void heatMap(CRGBPalette16 palette, bool up) {
+    fill_solid(leds, NUM_LEDS, CRGB::Black);
+    
+    // Add entropy to random number generator; we use a lot of it.
+    random16_add_entropy(random(256));
+    
+    uint8_t cooling = 55;
+    uint8_t sparking = 120;
+    
+    // Array of temperature readings at each simulation cell
+    static const uint8_t halfLedCount = NUM_LEDS / 2;
+    static byte heat[2][halfLedCount];
+    
+    byte colorindex;
+    
+    for(uint8_t x = 0; x < 2; x++) {
+        // Step 1.  Cool down every cell a little
+        for( int i = 0; i < halfLedCount; i++) {
+          heat[x][i] = qsub8( heat[x][i],  random8(0, ((cooling * 10) / halfLedCount) + 2));
+        }
+        
+        // Step 2.  Heat from each cell drifts 'up' and diffuses a little
+        for( int k= halfLedCount - 1; k >= 2; k--) {
+          heat[x][k] = (heat[x][k - 1] + heat[x][k - 2] + heat[x][k - 2] ) / 3;
+        }
+        
+        // Step 3.  Randomly ignite new 'sparks' of heat near the bottom
+        if( random8() < sparking ) {
+          int y = random8(7);
+          heat[x][y] = qadd8( heat[x][y], random8(160,255) );
+        }
+        
+        // Step 4.  Map from heat cells to LED colors
+        for( int j = 0; j < halfLedCount; j++) {
+            // Scale the heat value from 0-255 down to 0-240
+            // for best results with color palettes.
+            colorindex = scale8(heat[x][j], 240);
+            
+            CRGB color = ColorFromPalette(palette, colorindex);
+            
+            if(up) {
+                if(x == 0) {
+                    leds[(halfLedCount - 1) - j] = color;
+                }
+                else {
+                    leds[halfLedCount + j] = color;
+                }
+            }
+            else {
+                if(x == 0) {
+                    leds[j] = color;
+                }
+                else {
+                    leds[(NUM_LEDS - 1) - j] = color;
+                }
+            }
+        }
+    }
+}
+
+int oldSecTime = 0;
+int oldSec = 0;
 
 void drawAnalogClock(byte second, byte minute, byte hour, boolean drawMillis, boolean drawSecond) {
     if(Time.second() != oldSec){
