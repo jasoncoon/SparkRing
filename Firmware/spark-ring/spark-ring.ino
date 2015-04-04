@@ -8,7 +8,7 @@ FASTLED_USING_NAMESPACE;
 
 #define LED_PIN     1
 #define CLOCK_PIN   0
-#define COLOR_ORDER GBR // jcoon-1 = GBR; jcoon-2 = BGR;
+#define COLOR_ORDER GBR // 1 = GBR; 2 = BGR;
 #define CHIPSET     APA102
 #define NUM_LEDS    60
 CRGB leds[NUM_LEDS];
@@ -180,21 +180,21 @@ int setVariable(String args) {
         r = parseByte(args.substring(2));
         solidColor.r = r;
         EEPROM.write(5, r);
-        patternIndex = 8;
+        patternIndex = patternCount - 1;
         return r;
     }
     else if (args.startsWith("g:")) {
         g = parseByte(args.substring(2));
         solidColor.g = g;
         EEPROM.write(6, g);
-        patternIndex = 8;
+        patternIndex = patternCount - 1;
         return g;
     }
     else if (args.startsWith("b:")) {
         b = parseByte(args.substring(2));
         solidColor.b = b;
         EEPROM.write(7, b);
-        patternIndex = 8;
+        patternIndex = patternCount - 1;
         return b;
     }
     
@@ -296,7 +296,7 @@ int setPatternName(String args)
 uint8_t rainbow() 
 {
   // FastLED's built-in rainbow generator
-  fill_rainbow( leds, NUM_LEDS, gHue, 4);
+  fill_rainbow( leds, NUM_LEDS, gHue, 255 / NUM_LEDS);
   return 8;
 }
 
@@ -353,7 +353,7 @@ uint8_t juggle() {
 uint8_t fire() {
     heatMap(HeatColors_p, true);
     
-    return 15;
+    return 30;
 }
 
 CRGBPalette16 icePalette = CRGBPalette16(CRGB::Black, CRGB::Blue, CRGB::Aqua, CRGB::White);
@@ -361,7 +361,7 @@ CRGBPalette16 icePalette = CRGBPalette16(CRGB::Black, CRGB::Blue, CRGB::Aqua, CR
 uint8_t water() {
     heatMap(icePalette, false);
     
-    return 30;
+    return 45;
 }
 
 uint8_t analogClock() {
@@ -479,18 +479,18 @@ void drawAnalogClock(byte second, byte minute, byte hour, boolean drawMillis, bo
     
     int millisecond = millis() - oldSecTime;
     
-    int secondIndex = second;
-    int minuteIndex = minute;
-    int hourIndex = hour * 5;
-    int millisecondIndex = secondIndex + millisecond * .06;
+    int secondIndex = map(second, 0, 59, 0, NUM_LEDS);
+    int minuteIndex = map(minute, 0, 59, 0, NUM_LEDS);
+    int hourIndex = map(hour * 5, 5, 60, 0, NUM_LEDS);
+    int millisecondIndex = map(secondIndex + millisecond * .06, 0, 60, 0, NUM_LEDS);
     
-    if(millisecondIndex >= 60)
-        millisecondIndex -= 60;
+    if(millisecondIndex >= NUM_LEDS)
+        millisecondIndex -= NUM_LEDS;
     
     hourIndex += minuteIndex / 12;
     
-    if(hourIndex >= 60)
-        hourIndex -= 60;
+    if(hourIndex >= NUM_LEDS)
+        hourIndex -= NUM_LEDS;
     
     // see if we need to reverse the order of the LEDS
     if(flipClock == 1) {
