@@ -24,20 +24,21 @@ app.controller('MainCtrl', function ($scope, $http, $timeout, patternService) {
   $scope.powerText = "On";
   $scope.status = "Please enter your access token.";
   $scope.disconnected = false;
+  $scope.accessToken = "a13ab5753537c8175158082783e2073ccde0c20d";
 
   $scope.patterns = [];
   $scope.patternIndex = 0;
 
   $scope.devices = [];
 
-  $scope.status = 'Loading access token...';
-  chrome.storage.sync.get('accessToken',
-    function(result) {
-      $scope.status = 'Loaded access token';
-      $scope.accessToken = result.accessToken;
-      $('#inputAccessToken').scope().$apply();
-    }
-  );
+  // $scope.status = 'Loading access token...';
+  // chrome.storage.sync.get('accessToken',
+    // function(result) {
+      // $scope.status = 'Loaded access token';
+      // $scope.accessToken = result.accessToken;
+      // $('#inputAccessToken').scope().$apply();
+    // }
+  // );
 
   $scope.getDevices = function() {
     $scope.status = 'Getting devices...';
