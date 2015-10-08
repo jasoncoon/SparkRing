@@ -21,9 +21,9 @@ Either of the following:
 
 [![Spark Ring](spark-ring-2.png)](https://www.adafruit.com/product/1586)
 
-[Adafruit Spark NeoPixel Ring Kit] *not currently available*:
+[Adafruit Spark NeoPixel Ring Kit]:
 
-[![Adafruit Spark NeoPixel Ring Kit](https://www.adafruit.com/images/230x173/2268-01.jpg)](https://www.adafruit.com/product/2268)
+[![Adafruit Spark NeoPixel Ring Kit](https://www.adafruit.com/images/145x109/2268-06.jpg)](https://www.adafruit.com/product/2268)
 
 Features
 --------
